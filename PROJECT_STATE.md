@@ -24,7 +24,7 @@ Last updated: 2026-09-25 (autonomous build session)
 | 5. Red team + decision | Done — **PIVOT (narrowed) → GO on wedge** | `docs/research/RED_TEAM.md` |
 | 6. Product/UX/tech docs | Done | `docs/product/*`, `docs/engineering/*` |
 | 7. Flutter MVP | Done | `app/` |
-| 8. Tests / CI | Done locally (format, analyze, test); CI defined | `.github/workflows/` |
+| 8. Tests / CI | 120 tests pass locally and in CI; format/analyze clean | `.github/workflows/ci.yml` |
 | 9. Release prep | Done (unsigned) | `release/`, `legal/`, `landing/`, `RELEASE_REPORT.md` |
 
 ## Decision summary
@@ -32,3 +32,7 @@ Last updated: 2026-09-25 (autonomous build session)
 * Market: **Great Britain (England, Scotland, Wales), household electricity on credit meters, standard variable (price-capped) or fixed tariffs, single-rate or Economy 7.**
 * Thesis: generic "bill explainer" is weak (Ofgem: ~82% say bills are easy to understand). Surviving wedge: **"Why did my electricity bill change?"** — deterministic change decomposition + reconciliation check + "is my Direct Debit right?" + next-bill verification of one chosen action.
 * Architecture: Flutter, local SQLite, no account, no backend, no paid AI, deterministic integer-arithmetic calculator, bundled versioned GB price-cap reference data used only as a labelled reference, never as the user's bill rate.
+
+## Where to start
+
+`RELEASE_REPORT.md` → HUMAN_ACTION_REQUIRED.

@@ -74,15 +74,23 @@ Local (Flutter 3.47.5, `TZ=Europe/London`): **120 passing** — fixed-point (11)
 
 ## Android
 
-Local Android SDK unavailable (egress blocked `dl.google.com`). CI builds release APK + AAB: see CI results below. Without keystore secrets the artifacts are debug-signed (installable for testing, not uploadable to Play).
+Local Android SDK unavailable (egress blocked `dl.google.com`). CI built the release APK + AAB successfully (see CI results). Without keystore secrets the artifacts are debug-signed (installable for testing, not uploadable to Play).
 
 ## iOS
 
-CI `macos-latest` builds `flutter build ios --release --no-codesign` and packages an unsigned `.ipa`: see CI results below. Signing blockers: `release/ios/APP_STORE_CHECKLIST.md`.
+CI `macos-latest` builds `flutter build ios --release --no-codesign` and packages an unsigned `.ipa` — built successfully (see CI results). Signing blockers: `release/ios/APP_STORE_CHECKLIST.md`.
 
 ## CI results
 
-CI_RESULTS_PLACEHOLDER
+Run [36147836746](https://github.com/yantorres023/EnergyLens/actions/runs/36147836746) on commit `7aee334` — **all green**:
+
+| Job | Result | Artifact |
+|---|---|---|
+| Format, analyze, tariff validation, 120 tests (incl. goldens, `TZ=Europe/London`) | ✅ success | — |
+| Android: `flutter build apk --release` + `flutter build appbundle --release` | ✅ success | `android-release` (~77 MB zip: APK + AAB, **debug-signed** — no keystore secrets yet) |
+| iOS: `flutter build ios --release --no-codesign` | ✅ success | `ios-unsigned` (~7.6 MB, unsigned `.ipa`, not installable) |
+
+Later commits (docs + one UI fix) re-run the same pipeline on every push.
 
 ## Monetization
 
@@ -156,5 +164,5 @@ See `docs/product/PRD.md` → Beta gates. Headline: bill completion ≥ 70%, pas
 - [x] product strategy · [x] tariff/data architecture · [x] PRD · [x] UX spec
 - [x] working Flutter MVP · [x] deterministic calculator · [x] bill history · [x] comparison · [x] actionable insights · [x] second-bill loop
 - [x] data integrity tests · [x] unit/widget/golden tests · [x] analyzer clean
-- [x] Android CI · [x] iOS CI (see CI results for build outcome)
+- [x] Android CI (APK + AAB built) · [x] iOS CI (unsigned build)
 - [x] privacy/security review · [x] monetization · [x] distribution · [x] landing page · [x] store metadata · [x] validation debt · [x] RELEASE_REPORT.md
