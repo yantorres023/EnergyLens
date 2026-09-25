@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EnergyLens — Why did my electricity bill change?</title>
+<meta name="description" content="See why your electricity bill changed, in pounds: days, usage, prices, standing charge, VAT and credits. Private, on your phone. For England, Scotland and Wales.">
+<style>
+  :root { --green:#1B6E5A; --ink:#1a1c1b; --muted:#555f5b; --bg:#f5faf7; --card:#ffffff; --up:#b3261e; --down:#1B6E5A; --line:#dde5e1; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink:#e6ebe8; --muted:#a9b4af; --bg:#111513; --card:#1a201d; --line:#2c3531; --up:#ffb4ab; --down:#7fd6b9; } }
+  * { box-sizing: border-box; }
+  body { margin:0; font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); line-height:1.15; margin: 0 0 12px; }
+  h2 { margin-top: 40px; }
+  .lede { color: var(--muted); font-size: 1.1rem; }
+  .card { background: var(--card); border:1px solid var(--line); border-radius: 16px; padding: 20px; margin: 20px 0; }
+  .row { display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .up { color: var(--up); font-weight: 600; white-space: nowrap; }
+  .down { color: var(--down); font-weight: 600; white-space: nowrap; }
+  .tag { display:inline-block; font-size:.8rem; padding:2px 8px; border-radius:10px; background: var(--line); color: var(--muted); }
+  ul { padding-left: 1.2em; }
+  .note { font-size: .92rem; color: var(--muted); }
+  a { color: var(--green); }
+  .cta { display:inline-block; background: var(--green); color:#fff; padding: 12px 20px; border-radius: 24px; text-decoration: none; font-weight:600; }
+</style>
+</head>
+<body>
+<main>
+  <p class="tag">Working name · beta in preparation</p>
+  <h1>Why did my electricity bill change?</h1>
+  <p class="lede">Add two bills. EnergyLens splits the difference into plain reasons — each with its pound amount — and they add up exactly.</p>
+
+  <div class="card" aria-label="Worked example">
+    <strong>Worked example</strong> <span class="tag">illustrative figures, not a real customer</span>
+    <p>September bill £95.50 → October bill £106.75: <strong>£11.25 more</strong></p>
+    <div class="row"><span>Used more per day (10.0 to 11.0 kWh)</span><span class="up">+£8.10</span></div>
+    <div class="row"><span>Higher price per kWh (24.87p to 26.32p before VAT)</span><span class="up">+£5.19</span></div>
+    <div class="row"><span>Billing period 1 day longer</span><span class="up">+£3.18</span></div>
+    <div class="row"><span>Higher daily standing charge</span><span class="up">+£0.12</span></div>
+    <div class="row"><span>VAT rate changed (5% to 0%)</span><span class="down">−£5.34</span></div>
+    <p class="note">Calculated from the figures on the two bills. Weather and season change usage, so a usage increase isn't proof anything went wrong.</p>
+  </div>
+
+  <h2>What it does</h2>
+  <ul>
+    <li>Recalculates your bill and checks it against the total printed on it.</li>
+    <li>Handles bills that span a price change and Economy 7 day/night rates.</li>
+    <li>Paste text from a PDF bill — it finds the figures, you check them.</li>
+    <li>"What if?": what a tariff quote would have cost for your real usage.</li>
+    <li>"Is my Direct Debit right?" — clearly labelled as an estimate.</li>
+    <li>Pick one thing to try, and your next bill shows whether it changed.</li>
+  </ul>
+
+  <h2>Private and independent</h2>
+  <ul>
+    <li>Works on your phone only. No account, no supplier login, no internet access.</li>
+    <li>Never asks for your name, address, account number or MPAN.</li>
+    <li>Not your supplier, not Ofgem, not a comparison site. No commission, no ads.</li>
+  </ul>
+
+  <h2>What it won't do</h2>
+  <p>It won't guarantee savings, pretend to know what each appliance costs, or tell you which supplier to pick. Some features are estimates, and the app says so.</p>
+
+  <p><a class="cta" href="mailto:hello@example.invalid?subject=EnergyLens%20beta">Join the beta (email)</a></p>
+  <p class="note">For households in England, Scotland and Wales with a credit (non-prepayment) electricity meter. <a href="../legal/PRIVACY_POLICY.md">Privacy</a> · <a href="../legal/TERMS.md">Terms</a></p>
+</main>
+</body>
+</html>

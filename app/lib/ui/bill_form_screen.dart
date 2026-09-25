@@ -121,14 +121,17 @@ class _BillFormScreenState extends State<BillFormScreen> {
     }
   }
 
+  bool _defaultsApplied = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.existing == null &&
-        widget.parsed?.fields.containsKey(ParsedFieldKey.kwhDay) != true) {
-      _e7 =
-          _e7 ||
-          AppScope.read(context).household?.meterType == MeterType.economy7;
+    // Apply the household's meter type once; later rebuilds must not undo a
+    // user's choice.
+    if (_defaultsApplied) return;
+    _defaultsApplied = true;
+    if (widget.existing == null && widget.parsed == null) {
+      _e7 = AppScope.read(context).household?.meterType == MeterType.economy7;
     }
   }
 
