@@ -153,7 +153,6 @@ class ExperimentEngine {
     List<Bill> allBills = const [],
     int? directDebit,
   }) {
-    final c0 = calculator.calculate(baseline);
     final c1 = calculator.calculate(result);
     final caveats = <String>{};
     if (seasonOf(midpoint(baseline.periodStart, baseline.periodEnd)) !=

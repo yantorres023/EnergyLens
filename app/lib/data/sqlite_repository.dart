@@ -207,7 +207,13 @@ class SqliteRepository implements Repository {
   @override
   Future<void> deleteAllData() async {
     await _db.transaction((txn) async {
-      for (final t in ['settings', 'households', 'bills', 'experiments', 'events']) {
+      for (final t in [
+        'settings',
+        'households',
+        'bills',
+        'experiments',
+        'events',
+      ]) {
         await txn.delete(t);
       }
     });

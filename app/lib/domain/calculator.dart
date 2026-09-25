@@ -113,7 +113,8 @@ class BillCalculation {
     if (totalPence <= 0) return 0;
     final grossStanding = netPence == 0
         ? standingPence
-        : standingPence + divRoundHalfAwayFromZero(vatPence * standingPence, netPence);
+        : standingPence +
+              divRoundHalfAwayFromZero(vatPence * standingPence, netPence);
     return divRoundHalfAwayFromZero(grossStanding * 1000, totalPence);
   }
 }
@@ -179,7 +180,10 @@ class BillCalculator {
       days += d;
       final suffix = multi ? ' (${isoDate(p.start)} to ${isoDate(p.end)})' : '';
 
-      final standingLine = costPence(d * milli, p.standingChargeMilliPencePerDay);
+      final standingLine = costPence(
+        d * milli,
+        p.standingChargeMilliPencePerDay,
+      );
       lines.add(
         CalcLine(
           kind: LineKind.standingCharge,
@@ -195,7 +199,8 @@ class BillCalculator {
       for (final r in p.registers) {
         final amount = costPence(r.kwhMilli, r.unitRateMilliPence);
         periodGross += amount;
-        kwhByRegister[r.register] = (kwhByRegister[r.register] ?? 0) + r.kwhMilli;
+        kwhByRegister[r.register] =
+            (kwhByRegister[r.register] ?? 0) + r.kwhMilli;
         lines.add(
           CalcLine(
             kind: LineKind.energy,

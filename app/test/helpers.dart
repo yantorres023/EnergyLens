@@ -69,18 +69,26 @@ Bill bill(
 
 /// 1–30 Sep 2026, 300 kWh @ 24.87p, 54.47p/day, VAT 5% → £95.50.
 Bill septemberBill({String id = 'sep', int? stated}) => bill(id, [
-  period(d(2026, 9, 1), d(2026, 9, 30), kwh: '300', rate: '24.87', standing: '54.47'),
+  period(
+    d(2026, 9, 1),
+    d(2026, 9, 30),
+    kwh: '300',
+    rate: '24.87',
+    standing: '54.47',
+  ),
 ], statedTotalPence: stated);
 
 /// 1–31 Oct 2026, 341 kWh @ 26.32p, 54.83p/day, VAT 0% → £106.75.
-Bill octoberBill({String id = 'oct', ReadingType reading = ReadingType.actual}) =>
-    bill(id, [
-      period(
-        d(2026, 10, 1),
-        d(2026, 10, 31),
-        kwh: '341',
-        rate: '26.32',
-        standing: '54.83',
-        vatBp: 0,
-      ),
-    ], readingType: reading);
+Bill octoberBill({
+  String id = 'oct',
+  ReadingType reading = ReadingType.actual,
+}) => bill(id, [
+  period(
+    d(2026, 10, 1),
+    d(2026, 10, 31),
+    kwh: '341',
+    rate: '26.32',
+    standing: '54.83',
+    vatBp: 0,
+  ),
+], readingType: reading);

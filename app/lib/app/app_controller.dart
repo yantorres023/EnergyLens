@@ -14,7 +14,10 @@ import 'analytics.dart';
 
 String newId() {
   final r = Random.secure();
-  return List.generate(16, (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+  return List.generate(
+    16,
+    (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0'),
+  ).join();
 }
 
 /// Holds app state and coordinates domain services with storage.
@@ -65,11 +68,15 @@ class AppController extends ChangeNotifier {
     experiments = await repository.listExperiments(h.id);
   }
 
-  bool get needsOnboarding => !settings.onboardingCompleted || household == null;
+  bool get needsOnboarding =>
+      !settings.onboardingCompleted || household == null;
 
   bool get referenceIsStale => reference == null || reference!.isStale(clock());
 
-  Future<void> completeOnboarding(Household h, {required bool analyticsOptIn}) async {
+  Future<void> completeOnboarding(
+    Household h, {
+    required bool analyticsOptIn,
+  }) async {
     household = h;
     await repository.saveHousehold(h);
     settings = settings.copyWith(
@@ -103,7 +110,10 @@ class AppController extends ChangeNotifier {
   }
 
   /// Saves a bill. Returns experiments completed by this bill.
-  Future<List<SavingsExperiment>> saveBill(Bill bill, {bool isEdit = false}) async {
+  Future<List<SavingsExperiment>> saveBill(
+    Bill bill, {
+    bool isEdit = false,
+  }) async {
     // Validate before storing: throws ValidationError on impossible input.
     final calc = calculator.calculate(bill);
     final hadEarlier = bills.any(
@@ -135,9 +145,12 @@ class AppController extends ChangeNotifier {
   Future<List<SavingsExperiment>> _evaluateExperiments(Bill newBill) async {
     final done = <SavingsExperiment>[];
     final engine = ExperimentEngine(calculator: calculator);
-    for (final e in experiments.where((e) => e.status == ExperimentStatus.active)) {
+    for (final e in experiments.where(
+      (e) => e.status == ExperimentStatus.active,
+    )) {
       final baseline = billById(e.baselineBillId);
-      if (baseline == null || !ExperimentEngine.isLaterBill(baseline, newBill)) {
+      if (baseline == null ||
+          !ExperimentEngine.isLaterBill(baseline, newBill)) {
         continue;
       }
       final eval = engine.evaluate(
@@ -174,12 +187,17 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<SavingsExperiment> startExperiment(ActionType action, Bill baseline) async {
+  Future<SavingsExperiment> startExperiment(
+    ActionType action,
+    Bill baseline,
+  ) async {
     // One active experiment per action type keeps verification unambiguous.
     for (final e in experiments.where(
       (e) => e.status == ExperimentStatus.active && e.action == action,
     )) {
-      await repository.saveExperiment(e.copyWith(status: ExperimentStatus.abandoned));
+      await repository.saveExperiment(
+        e.copyWith(status: ExperimentStatus.abandoned),
+      );
     }
     final exp = ExperimentEngine(calculator: calculator).start(
       id: newId(),
@@ -196,7 +214,9 @@ class AppController extends ChangeNotifier {
   }
 
   Future<void> abandonExperiment(SavingsExperiment e) async {
-    await repository.saveExperiment(e.copyWith(status: ExperimentStatus.abandoned));
+    await repository.saveExperiment(
+      e.copyWith(status: ExperimentStatus.abandoned),
+    );
     await _reloadCollections();
     notifyListeners();
   }

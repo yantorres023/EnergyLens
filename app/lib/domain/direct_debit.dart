@@ -51,7 +51,8 @@ class DirectDebitCheck {
     BillCalculator calculator = const BillCalculator(),
   }) {
     if (bills.isEmpty || currentMonthlyPence <= 0) return null;
-    final sorted = [...bills]..sort((a, b) => a.periodEnd.compareTo(b.periodEnd));
+    final sorted = [...bills]
+      ..sort((a, b) => a.periodEnd.compareTo(b.periodEnd));
     var days = 0;
     var kwh = 0;
     for (final b in sorted) {
@@ -76,7 +77,8 @@ class DirectDebitCheck {
           : (latestTotalKwh == 0
                 ? divRoundHalfAwayFromZero(annualKwh, regs.length)
                 : divRoundHalfAwayFromZero(
-                    annualKwh * (latestCalc.kwhMilliByRegister[regs[i].register] ?? 0),
+                    annualKwh *
+                        (latestCalc.kwhMilliByRegister[regs[i].register] ?? 0),
                     latestTotalKwh,
                   ));
       remaining -= share;

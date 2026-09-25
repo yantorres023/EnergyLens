@@ -30,7 +30,13 @@ void main() {
   test('identical bills produce no effects', () {
     final a = septemberBill(id: 'a');
     final b = bill('b', [
-      period(d(2026, 10, 1), d(2026, 10, 30), kwh: '300', rate: '24.87', standing: '54.47'),
+      period(
+        d(2026, 10, 1),
+        d(2026, 10, 30),
+        kwh: '300',
+        rate: '24.87',
+        standing: '54.47',
+      ),
     ]);
     final c = BillComparison.compare(a, b);
     expect(c.differencePence, 0);
@@ -39,14 +45,35 @@ void main() {
 
   test('only period length changed', () {
     final a = bill('a', [
-      period(d(2026, 1, 1), d(2026, 1, 30), kwh: '300', rate: '20', standing: '50', vatBp: 0),
+      period(
+        d(2026, 1, 1),
+        d(2026, 1, 30),
+        kwh: '300',
+        rate: '20',
+        standing: '50',
+        vatBp: 0,
+      ),
     ]);
     final b = bill('b', [
-      period(d(2026, 1, 31), d(2026, 3, 1), kwh: '310', rate: '20', standing: '50', vatBp: 0),
+      period(
+        d(2026, 1, 31),
+        d(2026, 3, 1),
+        kwh: '310',
+        rate: '20',
+        standing: '50',
+        vatBp: 0,
+      ),
     ]);
     // b: 30 days? 31 Jan → 1 Mar = 30 days. Make it 31 days explicitly:
     final b31 = bill('b31', [
-      period(d(2026, 1, 31), d(2026, 3, 2), kwh: '310', rate: '20', standing: '50', vatBp: 0),
+      period(
+        d(2026, 1, 31),
+        d(2026, 3, 2),
+        kwh: '310',
+        rate: '20',
+        standing: '50',
+        vatBp: 0,
+      ),
     ]);
     expect(b.days, 30);
     final c = BillComparison.compare(a, b31);
@@ -58,10 +85,23 @@ void main() {
 
   test('only VAT changed (5% → 0%)', () {
     final a = bill('a', [
-      period(d(2026, 9, 1), d(2026, 9, 30), kwh: '300', rate: '20', standing: '50'),
+      period(
+        d(2026, 9, 1),
+        d(2026, 9, 30),
+        kwh: '300',
+        rate: '20',
+        standing: '50',
+      ),
     ]);
     final b = bill('b', [
-      period(d(2026, 10, 1), d(2026, 10, 30), kwh: '300', rate: '20', standing: '50', vatBp: 0),
+      period(
+        d(2026, 10, 1),
+        d(2026, 10, 30),
+        kwh: '300',
+        rate: '20',
+        standing: '50',
+        vatBp: 0,
+      ),
     ]);
     final c = BillComparison.compare(a, b);
     // net 7500, VAT 375.
@@ -71,10 +111,24 @@ void main() {
 
   test('only standing charge changed', () {
     final a = bill('a', [
-      period(d(2026, 9, 1), d(2026, 9, 30), kwh: '300', rate: '20', standing: '50', vatBp: 0),
+      period(
+        d(2026, 9, 1),
+        d(2026, 9, 30),
+        kwh: '300',
+        rate: '20',
+        standing: '50',
+        vatBp: 0,
+      ),
     ]);
     final b = bill('b', [
-      period(d(2026, 10, 1), d(2026, 10, 30), kwh: '300', rate: '20', standing: '60', vatBp: 0),
+      period(
+        d(2026, 10, 1),
+        d(2026, 10, 30),
+        kwh: '300',
+        rate: '20',
+        standing: '60',
+        vatBp: 0,
+      ),
     ]);
     final c = BillComparison.compare(a, b);
     expect(c.differencePence, 300);
@@ -83,9 +137,19 @@ void main() {
 
   test('credits show up as an adjustments effect', () {
     final a = septemberBill(id: 'a');
-    final b = bill('b', [
-      period(d(2026, 10, 1), d(2026, 10, 30), kwh: '300', rate: '24.87', standing: '54.47'),
-    ], adjustments: const [Adjustment(label: 'Credit', amountPence: -2000)]);
+    final b = bill(
+      'b',
+      [
+        period(
+          d(2026, 10, 1),
+          d(2026, 10, 30),
+          kwh: '300',
+          rate: '24.87',
+          standing: '54.47',
+        ),
+      ],
+      adjustments: const [Adjustment(label: 'Credit', amountPence: -2000)],
+    );
     final c = BillComparison.compare(a, b);
     expect(c.differencePence, -2000);
     expect(c.effects.single.type, EffectType.adjustments);
@@ -93,10 +157,24 @@ void main() {
 
   test('zero-usage previous bill: change is usage, not price', () {
     final a = bill('a', [
-      period(d(2026, 9, 1), d(2026, 9, 30), kwh: '0', rate: '20', standing: '50', vatBp: 0),
+      period(
+        d(2026, 9, 1),
+        d(2026, 9, 30),
+        kwh: '0',
+        rate: '20',
+        standing: '50',
+        vatBp: 0,
+      ),
     ]);
     final b = bill('b', [
-      period(d(2026, 10, 1), d(2026, 10, 30), kwh: '100', rate: '20', standing: '50', vatBp: 0),
+      period(
+        d(2026, 10, 1),
+        d(2026, 10, 30),
+        kwh: '100',
+        rate: '20',
+        standing: '50',
+        vatBp: 0,
+      ),
     ]);
     final c = BillComparison.compare(a, b);
     expect(c.differencePence, 2000);
@@ -136,12 +214,28 @@ void main() {
     );
     final gap = BillComparison.compare(
       septemberBill(),
-      bill('late', [period(d(2026, 11, 1), d(2026, 11, 30), kwh: '1', rate: '1', standing: '1')]),
+      bill('late', [
+        period(
+          d(2026, 11, 1),
+          d(2026, 11, 30),
+          kwh: '1',
+          rate: '1',
+          standing: '1',
+        ),
+      ]),
     );
     expect(gap.caveats, contains(ComparisonCaveat.gapBetweenBills));
     final overlap = BillComparison.compare(
       septemberBill(),
-      bill('ov', [period(d(2026, 9, 20), d(2026, 10, 20), kwh: '1', rate: '1', standing: '1')]),
+      bill('ov', [
+        period(
+          d(2026, 9, 20),
+          d(2026, 10, 20),
+          kwh: '1',
+          rate: '1',
+          standing: '1',
+        ),
+      ]),
     );
     expect(overlap.caveats, contains(ComparisonCaveat.overlappingPeriods));
   });
@@ -155,16 +249,20 @@ void main() {
     }
 
     for (var i = 0; i < 300; i++) {
-      final a = bill('a$i', [
-        period(
-          d(2026, 1, 1),
-          d(2026, 1, 1).add(Duration(days: 20 + next(80))),
-          kwh: '${next(2000)}.${next(1000)}',
-          rate: '${10 + next(40)}.${next(100)}',
-          standing: '${next(80)}.${next(100)}',
-          vatBp: next(2) * 500,
-        ),
-      ], adjustments: [Adjustment(label: 'x', amountPence: next(3000) - 1500)]);
+      final a = bill(
+        'a$i',
+        [
+          period(
+            d(2026, 1, 1),
+            d(2026, 1, 1).add(Duration(days: 20 + next(80))),
+            kwh: '${next(2000)}.${next(1000)}',
+            rate: '${10 + next(40)}.${next(100)}',
+            standing: '${next(80)}.${next(100)}',
+            vatBp: next(2) * 500,
+          ),
+        ],
+        adjustments: [Adjustment(label: 'x', amountPence: next(3000) - 1500)],
+      );
       final start = d(2026, 6, 1);
       final b = bill('b$i', [
         period(

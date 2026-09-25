@@ -234,9 +234,9 @@ class BillComparison {
     if (previous.usageIsEstimated || current.usageIsEstimated) {
       caveats.add(ComparisonCaveat.estimatedReading);
     }
-    final gap = dateOnly(
-      current.periodStart,
-    ).difference(dateOnly(previous.periodEnd)).inDays;
+    final gap = dateOnly(current.periodStart)
+        .difference(dateOnly(previous.periodEnd))
+        .inDays;
     if (gap > 1) caveats.add(ComparisonCaveat.gapBetweenBills);
     if (gap < 1) caveats.add(ComparisonCaveat.overlappingPeriods);
     if (c0.reconciliation == ReconciliationStatus.mismatch ||

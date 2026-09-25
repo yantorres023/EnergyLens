@@ -97,7 +97,10 @@ void main() {
     final r = parser.parse(splitBill);
     expect(r.fields[ParsedFieldKey.periodStart]!.value, '2026-09-15');
     expect(r.fields[ParsedFieldKey.periodEnd]!.value, '2026-10-14');
-    expect(r.fields[ParsedFieldKey.unitRateSingle]!.confidence, ParseConfidence.low);
+    expect(
+      r.fields[ParsedFieldKey.unitRateSingle]!.confidence,
+      ParseConfidence.low,
+    );
     expect(r.notes.join(' '), contains('second rate period'));
     expect(r.notes.join(' '), contains('VAT'));
   });

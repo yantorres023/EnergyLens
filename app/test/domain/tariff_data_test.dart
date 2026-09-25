@@ -7,7 +7,8 @@ import '../helpers.dart';
 
 /// Tariff data is code: these tests run in CI on every change.
 void main() {
-  final raw = File('assets/data/gb_price_cap_electricity.json').readAsStringSync();
+  final raw = File('assets/data/gb_price_cap_electricity.json')
+      .readAsStringSync();
   final ds = TariffDataset.parse(raw);
 
   test('bundled dataset passes every integrity rule', () {
@@ -32,7 +33,8 @@ void main() {
   });
 
   test('versions within a series are contiguous (no gaps, no overlaps)', () {
-    final list = [...ds.versions]..sort((a, b) => a.effectiveFrom.compareTo(b.effectiveFrom));
+    final list = [...ds.versions]
+      ..sort((a, b) => a.effectiveFrom.compareTo(b.effectiveFrom));
     for (var i = 1; i < list.length; i++) {
       expect(
         list[i].effectiveFrom.difference(list[i - 1].effectiveTo).inDays,
@@ -68,7 +70,10 @@ void main() {
     expect(ds.isStale(d(2027, 1, 1)), isTrue);
     // Too long since last verification also counts as stale.
     final old = TariffDataset.parse(
-      raw.replaceAll('"last_verified_at": "2026-09-25"', '"last_verified_at": "2026-05-01"'),
+      raw.replaceAll(
+        '"last_verified_at": "2026-09-25"',
+        '"last_verified_at": "2026-05-01"',
+      ),
     );
     expect(old.isStale(d(2026, 12, 1)), isTrue);
   });
@@ -78,28 +83,42 @@ void main() {
 
     test('duplicate ids', () {
       final bad = TariffDataset.parse(
-        mutate('gb-cap-elec-avg-dd-single-2026q2', 'gb-cap-elec-avg-dd-single-2026q1'),
+        mutate(
+          'gb-cap-elec-avg-dd-single-2026q2',
+          'gb-cap-elec-avg-dd-single-2026q1',
+        ),
       );
       expect(bad.validate().join(), contains('duplicate'));
     });
     test('overlapping versions', () {
-      final bad = TariffDataset.parse(mutate('"effective_to": "2026-03-31"', '"effective_to": "2026-04-05"'));
+      final bad = TariffDataset.parse(
+        mutate('"effective_to": "2026-03-31"', '"effective_to": "2026-04-05"'),
+      );
       expect(bad.validate().join(), contains('overlaps'));
     });
     test('negative and implausible rates', () {
       expect(
-        TariffDataset.parse(mutate('"rate": "27.69"', '"rate": "-1"')).validate().join(),
+        TariffDataset.parse(mutate('"rate": "27.69"', '"rate": "-1"'))
+            .validate()
+            .join(),
         contains('negative rate'),
       );
       expect(
-        TariffDataset.parse(mutate('"rate": "27.69"', '"rate": "2769"')).validate().join(),
+        TariffDataset.parse(mutate('"rate": "27.69"', '"rate": "2769"'))
+            .validate()
+            .join(),
         contains('implausible'),
       );
     });
     test('non-https source and wrong currency', () {
       final bad = TariffDataset.parse(
-        mutate('"source_url": "https://www.ofgem', '"source_url": "http://www.ofgem')
-            .replaceFirst('"currency": "GBP",\n      "effective_from"', '"currency": "EUR",\n      "effective_from"'),
+        mutate(
+          '"source_url": "https://www.ofgem',
+          '"source_url": "http://www.ofgem',
+        ).replaceFirst(
+          '"currency": "GBP",\n      "effective_from"',
+          '"currency": "EUR",\n      "effective_from"',
+        ),
       );
       final problems = bad.validate().join('\n');
       expect(problems, contains('https'));
@@ -107,7 +126,9 @@ void main() {
     });
     test('unparseable values throw with details', () {
       expect(
-        () => TariffDataset.parse(mutate('"standing_charge": "54.75"', '"standing_charge": "abc"')),
+        () => TariffDataset.parse(
+          mutate('"standing_charge": "54.75"', '"standing_charge": "abc"'),
+        ),
         throwsA(isA<TariffDataException>()),
       );
     });

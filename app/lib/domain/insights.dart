@@ -97,7 +97,9 @@ class InsightEngine {
           Insight(
             kind: InsightKind.mainDriver,
             provenance: Provenance.calculated,
-            confidence: cmp.caveats.isEmpty ? Confidence.high : Confidence.medium,
+            confidence: cmp.caveats.isEmpty
+                ? Confidence.high
+                : Confidence.medium,
             amountPence: main.amountPence,
             effect: main.type,
             suggestedAction: _actionForEffect(main.type, current, household),
@@ -119,7 +121,9 @@ class InsightEngine {
       final p0 = cmp.previousCalc.kwhPerDayMilli;
       final p1 = c.kwhPerDayMilli;
       // ≥10% more per day.
-      if (p0 > 0 && (p1 - p0) * 10 >= p0 && main?.type != EffectType.dailyUsage) {
+      if (p0 > 0 &&
+          (p1 - p0) * 10 >= p0 &&
+          main?.type != EffectType.dailyUsage) {
         out.add(
           Insight(
             kind: InsightKind.dailyUsageUp,
@@ -159,7 +163,8 @@ class InsightEngine {
           provenance: Provenance.calculated,
           confidence: Confidence.high,
           valueMilli: share,
-          amountPence: c.standingPence +
+          amountPence:
+              c.standingPence +
               (c.netPence == 0
                   ? 0
                   : divRoundHalfAwayFromZero(
@@ -244,7 +249,9 @@ class InsightEngine {
     }
     return Insight(
       kind: InsightKind.economy7Split,
-      provenance: breakEven == null ? Provenance.calculated : Provenance.estimated,
+      provenance: breakEven == null
+          ? Provenance.calculated
+          : Provenance.estimated,
       confidence: breakEven == null ? Confidence.high : Confidence.low,
       valueMilli: night,
       secondaryMilli: breakEven,
@@ -253,7 +260,7 @@ class InsightEngine {
     );
   }
 
-  /// "If your prices move like the GB-average cap on <date>…" — ESTIMATED.
+  /// "If your prices move like the GB-average cap on the next change date…" — ESTIMATED.
   /// Only for standard variable tariffs and only with fresh reference data.
   Insight? _capPreview(
     Bill bill,
@@ -277,13 +284,19 @@ class InsightEngine {
     final standNext = next.standingExVatMilliPencePerDay;
     if (unitNow == 0 || standNow == 0) return null;
 
-    final energyNext = divRoundHalfAwayFromZero(c.energyPence * unitNext, unitNow);
+    final energyNext = divRoundHalfAwayFromZero(
+      c.energyPence * unitNext,
+      unitNow,
+    );
     final standingNext = divRoundHalfAwayFromZero(
       c.standingPence * standNext,
       standNow,
     );
     final netNext = energyNext + standingNext;
-    final vatNext = divRoundHalfAwayFromZero(netNext * next.vatBasisPoints, 10000);
+    final vatNext = divRoundHalfAwayFromZero(
+      netNext * next.vatBasisPoints,
+      10000,
+    );
     final totalNext = netNext + vatNext;
     final currentGross = c.netPence + c.vatPence;
     return Insight(

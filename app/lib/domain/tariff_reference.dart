@@ -156,7 +156,9 @@ class TariffDataset {
     final problems = <String>[];
     final ids = <String>{};
     for (final v in versions) {
-      if (!ids.add(v.tariffId)) problems.add('duplicate tariff_id ${v.tariffId}');
+      if (!ids.add(v.tariffId)) {
+        problems.add('duplicate tariff_id ${v.tariffId}');
+      }
       if (v.effectiveTo.isBefore(v.effectiveFrom)) {
         problems.add('${v.tariffId}: effective_to before effective_from');
       }
@@ -193,8 +195,12 @@ class TariffDataset {
       if (v.verificationStatus == VerificationStatus.unknown) {
         problems.add('${v.tariffId}: unknown verification_status');
       }
-      if (v.lastVerifiedAt.isBefore(v.effectiveFrom.subtract(const Duration(days: 60)))) {
-        problems.add('${v.tariffId}: last_verified_at predates publication window');
+      if (v.lastVerifiedAt.isBefore(
+        v.effectiveFrom.subtract(const Duration(days: 60)),
+      )) {
+        problems.add(
+          '${v.tariffId}: last_verified_at predates publication window',
+        );
       }
     }
     // No overlapping versions within one series.

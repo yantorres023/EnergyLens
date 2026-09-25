@@ -44,7 +44,13 @@ void main() {
     test('fixed charge only (zero usage) still costs the standing charge', () {
       final c = calc.calculate(
         bill('zero', [
-          period(d(2026, 9, 1), d(2026, 9, 30), kwh: '0', rate: '24.87', standing: '54.47'),
+          period(
+            d(2026, 9, 1),
+            d(2026, 9, 30),
+            kwh: '0',
+            rate: '24.87',
+            standing: '54.47',
+          ),
         ]),
       );
       expect(c.energyPence, 0);
@@ -57,7 +63,14 @@ void main() {
     test('flat rate with no standing charge', () {
       final c = calc.calculate(
         bill('flat', [
-          period(d(2026, 9, 1), d(2026, 9, 30), kwh: '100', rate: '30', standing: '0', vatBp: 0),
+          period(
+            d(2026, 9, 1),
+            d(2026, 9, 30),
+            kwh: '100',
+            rate: '30',
+            standing: '0',
+            vatBp: 0,
+          ),
         ]),
       );
       expect(c.totalPence, 3000);
@@ -69,7 +82,13 @@ void main() {
     test('total equals gross lines; VAT is backed out', () {
       final c = calc.calculate(
         bill('incl', [
-          period(d(2026, 7, 1), d(2026, 7, 30), kwh: '300', rate: '26.11', standing: '57.19'),
+          period(
+            d(2026, 7, 1),
+            d(2026, 7, 30),
+            kwh: '300',
+            rate: '26.11',
+            standing: '57.19',
+          ),
         ], ratesIncludeVat: true),
       );
       // 30 × 57.19 = 1715.7 → 1716; 300 × 26.11 = 7833; gross 9549.
@@ -84,7 +103,13 @@ void main() {
     test('bill spanning 1 October 2026: price and VAT change mid-bill', () {
       final c = calc.calculate(
         bill('split', [
-          period(d(2026, 9, 15), d(2026, 9, 30), kwh: '160', rate: '24.87', standing: '54.47'),
+          period(
+            d(2026, 9, 15),
+            d(2026, 9, 30),
+            kwh: '160',
+            rate: '24.87',
+            standing: '54.47',
+          ),
           period(
             d(2026, 10, 1),
             d(2026, 10, 14),
@@ -106,23 +131,59 @@ void main() {
     test('flags overlapping and gapped rate periods', () {
       final overlap = calc.calculate(
         bill('o', [
-          period(d(2026, 9, 1), d(2026, 9, 15), kwh: '1', rate: '1', standing: '1'),
-          period(d(2026, 9, 15), d(2026, 9, 30), kwh: '1', rate: '1', standing: '1'),
+          period(
+            d(2026, 9, 1),
+            d(2026, 9, 15),
+            kwh: '1',
+            rate: '1',
+            standing: '1',
+          ),
+          period(
+            d(2026, 9, 15),
+            d(2026, 9, 30),
+            kwh: '1',
+            rate: '1',
+            standing: '1',
+          ),
         ]),
       );
       expect(overlap.warnings, contains(CalcWarning.ratePeriodsOverlap));
       final gap = calc.calculate(
         bill('g', [
-          period(d(2026, 9, 1), d(2026, 9, 10), kwh: '1', rate: '1', standing: '1'),
-          period(d(2026, 9, 20), d(2026, 9, 30), kwh: '1', rate: '1', standing: '1'),
+          period(
+            d(2026, 9, 1),
+            d(2026, 9, 10),
+            kwh: '1',
+            rate: '1',
+            standing: '1',
+          ),
+          period(
+            d(2026, 9, 20),
+            d(2026, 9, 30),
+            kwh: '1',
+            rate: '1',
+            standing: '1',
+          ),
         ]),
       );
       expect(gap.warnings, contains(CalcWarning.ratePeriodsHaveGap));
     });
 
     test('unsorted periods are sorted before calculating', () {
-      final a = period(d(2026, 9, 1), d(2026, 9, 15), kwh: '10', rate: '20', standing: '50');
-      final b = period(d(2026, 9, 16), d(2026, 9, 30), kwh: '10', rate: '25', standing: '50');
+      final a = period(
+        d(2026, 9, 1),
+        d(2026, 9, 15),
+        kwh: '10',
+        rate: '20',
+        standing: '50',
+      );
+      final b = period(
+        d(2026, 9, 16),
+        d(2026, 9, 30),
+        kwh: '10',
+        rate: '25',
+        standing: '50',
+      );
       expect(
         calc.calculate(bill('x', [b, a])).totalPence,
         calc.calculate(bill('y', [a, b])).totalPence,
@@ -158,7 +219,11 @@ void main() {
       final c = calc.calculate(
         septemberBill().copyWith(
           adjustments: const [
-            Adjustment(label: 'Warm Home Discount', amountPence: -15000, kind: AdjustmentKind.credit),
+            Adjustment(
+              label: 'Warm Home Discount',
+              amountPence: -15000,
+              kind: AdjustmentKind.credit,
+            ),
           ],
         ),
       );
@@ -171,8 +236,14 @@ void main() {
 
   group('reconciliation', () {
     test('matches within 5p tolerance', () {
-      expect(calc.calculate(septemberBill(stated: 9550)).reconciliation, ReconciliationStatus.matches);
-      expect(calc.calculate(septemberBill(stated: 9545)).reconciliation, ReconciliationStatus.matches);
+      expect(
+        calc.calculate(septemberBill(stated: 9550)).reconciliation,
+        ReconciliationStatus.matches,
+      );
+      expect(
+        calc.calculate(septemberBill(stated: 9545)).reconciliation,
+        ReconciliationStatus.matches,
+      );
     });
     test('mismatch beyond tolerance reports the difference', () {
       final c = calc.calculate(septemberBill(stated: 9500));
@@ -185,26 +256,47 @@ void main() {
     test('end before start throws', () {
       expect(
         () => calc.calculate(
-          bill('bad', [period(d(2026, 9, 30), d(2026, 9, 1), kwh: '1', rate: '1')]),
+          bill('bad', [
+            period(d(2026, 9, 30), d(2026, 9, 1), kwh: '1', rate: '1'),
+          ]),
         ),
         throwsA(isA<ValidationError>()),
       );
     });
     test('no periods throws', () {
-      expect(() => calc.calculate(bill('none', const [])), throwsA(isA<ValidationError>()));
+      expect(
+        () => calc.calculate(bill('none', const [])),
+        throwsA(isA<ValidationError>()),
+      );
     });
     test('negative usage and odd VAT are flagged, not hidden', () {
       final c = calc.calculate(
         bill('neg', [
-          period(d(2026, 9, 1), d(2026, 9, 30), kwh: '-5', rate: '20', standing: '50', vatBp: 5000),
+          period(
+            d(2026, 9, 1),
+            d(2026, 9, 30),
+            kwh: '-5',
+            rate: '20',
+            standing: '50',
+            vatBp: 5000,
+          ),
         ]),
       );
-      expect(c.warnings, containsAll([CalcWarning.negativeUsage, CalcWarning.vatOutOfRange]));
+      expect(
+        c.warnings,
+        containsAll([CalcWarning.negativeUsage, CalcWarning.vatOutOfRange]),
+      );
     });
     test('very high usage is flagged but still calculated', () {
       final c = calc.calculate(
         bill('hi', [
-          period(d(2026, 9, 1), d(2026, 9, 30), kwh: '30000', rate: '26.32', standing: '54.83'),
+          period(
+            d(2026, 9, 1),
+            d(2026, 9, 30),
+            kwh: '30000',
+            rate: '26.32',
+            standing: '54.83',
+          ),
         ]),
       );
       expect(c.warnings, contains(CalcWarning.veryHighUsage));
@@ -237,17 +329,30 @@ void main() {
 
   group('meter readings', () {
     test('normal consumption', () {
-      expect(MeterConsumption.fromReadings(startMilli: m('12345'), endMilli: m('12645')), m('300'));
+      expect(
+        MeterConsumption.fromReadings(
+          startMilli: m('12345'),
+          endMilli: m('12645'),
+        ),
+        m('300'),
+      );
     });
     test('meter rollover on a 5-digit meter', () {
       expect(
-        MeterConsumption.fromReadings(startMilli: m('99950'), endMilli: m('120'), rolloverDigits: 5),
+        MeterConsumption.fromReadings(
+          startMilli: m('99950'),
+          endMilli: m('120'),
+          rolloverDigits: 5,
+        ),
         m('170'),
       );
     });
     test('lower closing reading without rollover confirmation is rejected', () {
       expect(
-        () => MeterConsumption.fromReadings(startMilli: m('500'), endMilli: m('400')),
+        () => MeterConsumption.fromReadings(
+          startMilli: m('500'),
+          endMilli: m('400'),
+        ),
         throwsA(isA<ValidationError>()),
       );
     });

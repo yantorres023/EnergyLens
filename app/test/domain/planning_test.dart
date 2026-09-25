@@ -26,10 +26,20 @@ Bill e7Bill({String id = 'e7', String night = '100', DateTime? start}) {
   ]);
 }
 
-Bill novemberBill({String kwh = '300', String rate = '26.32', ReadingType reading = ReadingType.actual}) =>
-    bill('nov', [
-      period(d(2026, 11, 1), d(2026, 11, 30), kwh: kwh, rate: rate, standing: '54.83', vatBp: 0),
-    ], readingType: reading);
+Bill novemberBill({
+  String kwh = '300',
+  String rate = '26.32',
+  ReadingType reading = ReadingType.actual,
+}) => bill('nov', [
+  period(
+    d(2026, 11, 1),
+    d(2026, 11, 30),
+    kwh: kwh,
+    rate: rate,
+    standing: '54.83',
+    vatBp: 0,
+  ),
+], readingType: reading);
 
 void main() {
   final reference = TariffDataset.parse(
@@ -73,13 +83,25 @@ void main() {
     });
 
     test('no bills or no Direct Debit → no check', () {
-      expect(DirectDebitCheck.run(bills: const [], currentMonthlyPence: 100), isNull);
-      expect(DirectDebitCheck.run(bills: [octoberBill()], currentMonthlyPence: 0), isNull);
+      expect(
+        DirectDebitCheck.run(bills: const [], currentMonthlyPence: 100),
+        isNull,
+      );
+      expect(
+        DirectDebitCheck.run(bills: [octoberBill()], currentMonthlyPence: 0),
+        isNull,
+      );
     });
 
     test('medium confidence needs 180+ days', () {
       final long = bill('long', [
-        period(d(2026, 1, 1), d(2026, 6, 30), kwh: '1800', rate: '25', standing: '55'),
+        period(
+          d(2026, 1, 1),
+          d(2026, 6, 30),
+          kwh: '1800',
+          rate: '25',
+          standing: '55',
+        ),
       ]);
       final r = DirectDebitCheck.run(bills: [long], currentMonthlyPence: 5000)!;
       expect(r.confidence, DirectDebitConfidence.medium);
@@ -101,18 +123,21 @@ void main() {
       expect(r.savingPence, 415);
     });
 
-    test('single-rate quote on an Economy 7 bill prices all kWh at one rate', () {
-      final r = whatIf.reprice(
-        e7Bill(),
-        AlternativeRates(
-          standingChargeMilliPencePerDay: m('50'),
-          unitRatesMilliPence: {Register.single: m('25')},
-        ),
-      );
-      expect(r.actual.totalPence, 9000);
-      expect(r.alternative.totalPence, 9000);
-      expect(r.savingPence, 0);
-    });
+    test(
+      'single-rate quote on an Economy 7 bill prices all kWh at one rate',
+      () {
+        final r = whatIf.reprice(
+          e7Bill(),
+          AlternativeRates(
+            standingChargeMilliPencePerDay: m('50'),
+            unitRatesMilliPence: {Register.single: m('25')},
+          ),
+        );
+        expect(r.actual.totalPence, 9000);
+        expect(r.alternative.totalPence, 9000);
+        expect(r.savingPence, 0);
+      },
+    );
 
     test('Economy 7 quote needs both rates', () {
       expect(
@@ -142,7 +167,11 @@ void main() {
     test('reduce daily usage: improved, with calculated value', () {
       final e = startOn(ActionType.reduceDailyUsage, octoberBill());
       expect(e.baselineMetricMilli, 11000);
-      final r = engine.evaluate(experiment: e, baseline: octoberBill(), result: novemberBill());
+      final r = engine.evaluate(
+        experiment: e,
+        baseline: octoberBill(),
+        result: novemberBill(),
+      );
       expect(r.outcome, ExperimentOutcome.improved);
       expect(r.resultMetricMilli, 10000);
       expect(r.counterfactualSavingPence, 790);
@@ -173,12 +202,18 @@ void main() {
       final e = startOn(ActionType.submitMeterReading, base);
       expect(e.baselineMetricMilli, 0);
       expect(
-        engine.evaluate(experiment: e, baseline: base, result: novemberBill()).outcome,
+        engine
+            .evaluate(experiment: e, baseline: base, result: novemberBill())
+            .outcome,
         ExperimentOutcome.improved,
       );
       expect(
         engine
-            .evaluate(experiment: e, baseline: base, result: novemberBill(reading: ReadingType.estimated))
+            .evaluate(
+              experiment: e,
+              baseline: base,
+              result: novemberBill(reading: ReadingType.estimated),
+            )
             .outcome,
         ExperimentOutcome.noClearChange,
       );
@@ -226,15 +261,27 @@ void main() {
     });
 
     test('only later bills can verify an experiment', () {
-      expect(ExperimentEngine.isLaterBill(octoberBill(), novemberBill()), isTrue);
-      expect(ExperimentEngine.isLaterBill(octoberBill(), septemberBill()), isFalse);
-      expect(ExperimentEngine.isLaterBill(octoberBill(), octoberBill()), isFalse);
+      expect(
+        ExperimentEngine.isLaterBill(octoberBill(), novemberBill()),
+        isTrue,
+      );
+      expect(
+        ExperimentEngine.isLaterBill(octoberBill(), septemberBill()),
+        isFalse,
+      );
+      expect(
+        ExperimentEngine.isLaterBill(octoberBill(), octoberBill()),
+        isFalse,
+      );
     });
 
     test('every action has catalog copy', () {
       for (final a in ActionType.values) {
         expect(actionCatalog[a], isNotNull);
-        expect(actionCatalog[a]!.howTo.toLowerCase(), isNot(contains('guarantee')));
+        expect(
+          actionCatalog[a]!.howTo.toLowerCase(),
+          isNot(contains('guarantee')),
+        );
       }
     });
   });
@@ -243,46 +290,64 @@ void main() {
     const engine = InsightEngine();
     const svt = Household(id: 'h1', tariffKind: TariffKind.standardVariable);
 
-    test('September → October: driver, VAT, price rise, fixed charge share', () {
-      final list = engine.build(
-        current: octoberBill(),
-        previous: septemberBill(),
-        household: svt,
-        reference: reference,
-        today: d(2026, 11, 5),
-      );
-      final kinds = list.map((i) => i.kind).toList();
-      expect(kinds.first, InsightKind.mainDriver);
-      expect(list.first.effect.toString(), contains('dailyUsage'));
-      expect(list.first.suggestedAction, ActionType.reduceDailyUsage);
-      expect(kinds, containsAll([InsightKind.vatChange, InsightKind.unitRateUp, InsightKind.standingChargeShare]));
-      // No Q1 2027 data bundled → no preview after October.
-      expect(kinds, isNot(contains(InsightKind.capChangePreview)));
-      for (final i in list) {
-        expect(i.provenance, isNot(Provenance.measured));
-      }
-    });
+    test(
+      'September → October: driver, VAT, price rise, fixed charge share',
+      () {
+        final list = engine.build(
+          current: octoberBill(),
+          previous: septemberBill(),
+          household: svt,
+          reference: reference,
+          today: d(2026, 11, 5),
+        );
+        final kinds = list.map((i) => i.kind).toList();
+        expect(kinds.first, InsightKind.mainDriver);
+        expect(list.first.effect.toString(), contains('dailyUsage'));
+        expect(list.first.suggestedAction, ActionType.reduceDailyUsage);
+        expect(
+          kinds,
+          containsAll([
+            InsightKind.vatChange,
+            InsightKind.unitRateUp,
+            InsightKind.standingChargeShare,
+          ]),
+        );
+        // No Q1 2027 data bundled → no preview after October.
+        expect(kinds, isNot(contains(InsightKind.capChangePreview)));
+        for (final i in list) {
+          expect(i.provenance, isNot(Provenance.measured));
+        }
+      },
+    );
 
-    test('cap preview is an ESTIMATE and only for standard variable tariffs', () {
-      final list = engine.build(
-        current: septemberBill(),
-        household: svt,
-        reference: reference,
-        today: d(2026, 9, 25),
-      );
-      final p = list.firstWhere((i) => i.kind == InsightKind.capChangePreview);
-      expect(p.provenance, Provenance.estimated);
-      expect(p.confidence, Confidence.low);
-      expect(p.referenceVersion!.tariffId, endsWith('2026q4'));
+    test(
+      'cap preview is an ESTIMATE and only for standard variable tariffs',
+      () {
+        final list = engine.build(
+          current: septemberBill(),
+          household: svt,
+          reference: reference,
+          today: d(2026, 9, 25),
+        );
+        final p = list.firstWhere(
+          (i) => i.kind == InsightKind.capChangePreview,
+        );
+        expect(p.provenance, Provenance.estimated);
+        expect(p.confidence, Confidence.low);
+        expect(p.referenceVersion!.tariffId, endsWith('2026q4'));
 
-      final fixed = engine.build(
-        current: septemberBill(),
-        household: const Household(id: 'h1', tariffKind: TariffKind.fixed),
-        reference: reference,
-        today: d(2026, 9, 25),
-      );
-      expect(fixed.map((i) => i.kind), isNot(contains(InsightKind.capChangePreview)));
-    });
+        final fixed = engine.build(
+          current: septemberBill(),
+          household: const Household(id: 'h1', tariffKind: TariffKind.fixed),
+          reference: reference,
+          today: d(2026, 9, 25),
+        );
+        expect(
+          fixed.map((i) => i.kind),
+          isNot(contains(InsightKind.capChangePreview)),
+        );
+      },
+    );
 
     test('stale reference data is never used', () {
       final list = engine.build(
@@ -291,21 +356,37 @@ void main() {
         reference: reference,
         today: d(2027, 6, 1),
       );
-      expect(list.map((i) => i.kind), isNot(contains(InsightKind.capChangePreview)));
+      expect(
+        list.map((i) => i.kind),
+        isNot(contains(InsightKind.capChangePreview)),
+      );
     });
 
     test('estimated reading and mismatch insights', () {
       final list = engine.build(
-        current: bill('e', [
-          period(d(2026, 9, 1), d(2026, 9, 30), kwh: '300', rate: '24.87', standing: '54.47'),
-        ], readingType: ReadingType.estimated, statedTotalPence: 9000),
+        current: bill(
+          'e',
+          [
+            period(
+              d(2026, 9, 1),
+              d(2026, 9, 30),
+              kwh: '300',
+              rate: '24.87',
+              standing: '54.47',
+            ),
+          ],
+          readingType: ReadingType.estimated,
+          statedTotalPence: 9000,
+        ),
         household: svt,
         today: d(2026, 10, 1),
       );
       final kinds = list.map((i) => i.kind).toList();
       expect(kinds.first, InsightKind.reconciliationMismatch);
       expect(list.first.amountPence, 550);
-      final est = list.firstWhere((i) => i.kind == InsightKind.estimatedReading);
+      final est = list.firstWhere(
+        (i) => i.kind == InsightKind.estimatedReading,
+      );
       expect(est.suggestedAction, ActionType.submitMeterReading);
     });
 
